@@ -9,26 +9,27 @@ const connectionRouter = {
   name: 'Connection',
   meta: {
     title: '公交接驳',
-    icon: 'tree-table'
+    icon: 'tree-table',
+    roles: ['admin']
   },
   children: [
     {
       path: 'connection-analysis',
       component: () => import('@/views/connection/connection-analysis'),
-      name: '接驳分析',
-      meta: { title: '接驳分析' }
+      name: '客流分析',
+      meta: { title: '客流分析', roles: ['admin'] }
     },
     {
       path: 'connection-line',
       component: () => import('@/views/connection/connection-line'),
       name: '接驳线路',
-      meta: { title: '接驳线路' }
+      meta: { title: '接驳线路', roles: ['admin'] }
     },
     {
       path: 'connection-programme',
       component: () => import('@/views/connection/connection-programme'),
       name: '接驳方案',
-      meta: { title: '接驳方案' }
+      meta: { title: '接驳方案', roles: ['admin'] }
     }
   ]
 }

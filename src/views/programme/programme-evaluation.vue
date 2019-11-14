@@ -1,18 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!-- <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
-      <el-select v-model="listQuery.importance" placeholder="事故线路" clearable style="width: 110px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+      <el-select v-model="listQuery.routes" placeholder="事故线路" 
+            clearable style="width: 150px" 
+            class="filter-item" multiple collapse-tags>
+            <el-option v-for="item in routes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="事故方向" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.directions" multiple collapse-tags placeholder="事故方向" clearable class="filter-item" style="width: 150px">
+        <el-option v-for="item in directions" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="事故类型" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.accidentTypes" placeholder="事故类型" clearable class="filter-item" multiple collapse-tags style="width: 170px">
+        <el-option v-for="item in accidentTypes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="事故等级" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.accidentLevels" placeholder="事故等级" clearable class="filter-item" multiple collapse-tags style="width: 150px">
+        <el-option v-for="item in accidentLevels" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         开始仿真
@@ -63,67 +64,7 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-const tableData = [{
-  from: '西门口',
-  to: {
-    '西门口': 0,
-    '公园前': 23,
-    '农讲所': 29,
-    '烈士陵园': 39,
-    '东山口': 53
-  }
-}, {
-  from: '公园前',
-  to: {
-    '西门口': 20,
-    '公园前': 0,
-    '农讲所': 32,
-    '烈士陵园': 35,
-    '东山口': 68
-  }
-}, {
-  from: '农讲所',
-  to: {
-    '西门口': 0,
-    '公园前': 23,
-    '农讲所': 29,
-    '烈士陵园': 39,
-    '东山口': 53
-  }
-}, {
-  from: '烈士陵园',
-  to: {
-    '西门口': 0,
-    '公园前': 23,
-    '农讲所': 29,
-    '烈士陵园': 39,
-    '东山口': 53
-  }
-}, {
-  from: '东山口',
-  to: {
-    '西门口': 0,
-    '公园前': 23,
-    '农讲所': 29,
-    '烈士陵园': 39,
-    '东山口': 53
-  }
-}
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+import { mixin } from '@/mixins'
 
 export default {
   name: 'ComplexTable',
@@ -142,58 +83,20 @@ export default {
       return calendarTypeKeyValue[type]
     }
   },
+  mixins: [mixin],
   data() {
     return {
       list: null,
-      tableData: tableData,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
-      },
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
-      dialogFormVisible: false,
-      dialogStatus: '',
-
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
-    }
-  },
-  computed: {
-    platforms() {
-      const arr = []
-      if (this.tableData && this.tableData.length > 0) {
-        this.tableData.forEach(v => {
-          arr.push(v.from)
-        })
-      }
-      return arr
-      // return this.tableData;
     }
   },
   created() {
     this.getList()
+    this.getRoutes()
+    this.getDirections()
+    this.getAccidentTypes()
+    this.getAccidentLevels()
+    this.getDataTable()
   },
   methods: {
     getList() {
@@ -210,14 +113,7 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
-    },
+    }
   }
 }
 </script>

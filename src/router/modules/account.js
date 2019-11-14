@@ -9,14 +9,15 @@ const accountRouter = {
   name: 'Account',
   meta: {
     title: '账户管理',
-    icon: 'peoples'
+    icon: 'peoples',
+    roles: ['admin']
   },
   children: [
     {
       path: 'account-infor',
       component: () => import('@/views/account/account-infor'),
       name: '用户信息',
-      meta: { title: '用户信息' }
+      meta: { title: '用户信息', roles: ['admin'] }
     }
   ]
 }

@@ -1,15 +1,29 @@
-import Cookies from 'js-cookie'
-
-const TokenKey = 'Admin-Token'
+const TokenKey = 'AdminToken'
 
 export function getToken() {
-  return Cookies.get(TokenKey)
+  var data = window.localStorage? localStorage.getItem(TokenKey): null;
+  if(data && data != 'undefined'){
+  	return JSON.parse(data);
+  }
+  return '';
 }
 
 export function setToken(token) {
-  return Cookies.set(TokenKey, token)
+  	if (window.localStorage) {
+  		try {
+  			localStorage.setItem(TokenKey, JSON.stringify(token));
+  		} catch(e) {
+  			alert('请关闭无痕浏览模式')
+  		}
+  	}
 }
 
 export function removeToken() {
-  return Cookies.remove(TokenKey)
+  	if (window.localStorage) {
+  		try {
+  			localStorage.removeItem(TokenKey);	
+  		} catch(e){
+  		}
+  	    
+  	}
 }

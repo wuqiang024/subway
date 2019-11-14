@@ -1,17 +1,45 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!-- <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
-      <el-select v-model="listQuery.importance" placeholder="文件类型" clearable style="width: 110px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+      <el-select v-model="listQuery.fileTypes" placeholder="文件类型" 
+            clearable style="width: 180px" 
+            class="filter-item">
+            <el-option v-for="item in fileTypes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="地铁线路" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.routes" placeholder="事故线路" 
+            clearable style="width: 150px" 
+            class="filter-item">
+            <el-option v-for="item in routes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         导入
       </el-button>
     </div>
+    <el-table
+      v-loading="listLoading"
+      :data="tableData"
+      border
+      fit
+      highlight-current-row
+      style="margin:15px auto"
+      v-if="listQuery.fileTypes!=6"
+    >
+      <el-table-column label="下行\上行" prop="from" align="center" />
+      <template v-for="v in platforms">
+        <el-table-column :label="v" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row['to'][v] || '--' }}</span>
+            <!-- {{ v }} -->
+          </template>
+        </el-table-column>
+      </template>
+
+    </el-table>
+
+    <div v-if="listQuery.fileTypes==6">
+      <tinymce v-model="content" :height="300" />
+    </div>
+    <!-- <div class="editor-content" v-html="content" /> -->
   </div>
 </template>
 <script>
@@ -19,6 +47,8 @@ import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { mixin } from '@/mixins'
+import Tinymce from '@/components/Tinymce'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -35,7 +65,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { Pagination, Tinymce },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -50,28 +80,14 @@ export default {
       return calendarTypeKeyValue[type]
     }
   },
+  mixins: [mixin],
   data() {
     return {
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined, // 事故类型
-        sort: '+id',
-        line: undefined, // 事故线路
-        direction: undefined, // 事故方向
-        level: undefined, // 事故等级
-        orderByTime: false, // 按最新时间
-        orderByLevel: false // 按最高等级
-      },
-      importanceOptions: [1, 2, 3],
       calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -96,11 +112,25 @@ export default {
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      content: '',
+      // content:
+      // `<h1 style="text-align: center;">Welcome to the TinyMCE demo!</h1><p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="//www.tinymce.com/images/glyph-tinymce@2x.png" alt="TinyMCE Logo" width="110" height="97" /><ul>
+      //   <li>Our <a href="//www.tinymce.com/docs/">documentation</a> is a great resource for learning how to configure TinyMCE.</li><li>Have a specific question? Visit the <a href="https://community.tinymce.com/forum/">Community Forum</a>.</li><li>We also offer enterprise grade support as part of <a href="https://tinymce.com/pricing">TinyMCE premium subscriptions</a>.</li>
+      // </ul>`
+    }
+  },
+  watch: {
+    'listQuery.orderBy': function(n, o) {
+      this.listQuery.page = 1
+      this.getList()
     }
   },
   created() {
     this.getList()
+    this.getRoutes()
+    this.getFileTypes()
+    this.getDataTable()
   },
   methods: {
     getList() {
@@ -117,6 +147,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1
+      console.log(this.listQuery)
       this.getList()
     },
     handleModifyStatus(row, status) {

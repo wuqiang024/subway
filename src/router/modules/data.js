@@ -9,20 +9,21 @@ const dataRouter = {
   name: 'Data',
   meta: {
     title: '数据管理',
-    icon: 'tree'
+    icon: 'tree',
+    roles: ['admin']
   },
   children: [
     {
       path: 'data-search',
       component: () => import('@/views/data/data-search'),
       name: '数据查找',
-      meta: { title: '数据查找' }
+      meta: { title: '数据查找', roles: ['admin'] }
     },
     {
       path: 'data-import',
       component: () => import('@/views/data/data-import'),
       name: '数据查找',
-      meta: { title: '数据导入' }
+      meta: { title: '数据导入', roles: ['admin'] }
     }
   ]
 }

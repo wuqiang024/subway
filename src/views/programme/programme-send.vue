@@ -27,6 +27,13 @@
   <div class="tab-container">
     <el-tabs v-model="activeName" style="margin-top:15px;" type="border-card" @tab-click="handleClick">
       <el-tab-pane label="接收者列表" name="first">
+        <el-row style="margin-top: 20px">
+          <el-col :span="12" style="text-align: left;">
+            <el-button type="primary" size="big" @click="">
+              添加接收者
+            </el-button>
+          </el-col>
+        </el-row>
         <el-table
           :data="tableData"
           border
@@ -80,11 +87,11 @@
           style="width: 100%;margin:15px auto"
         >
           <el-table-column label="序号" prop="id" align="center" width="120" />
-          <el-table-column label="收件人名称" prop="name" align="center" width="120" />
-          <el-table-column label="收件人邮箱" prop="email" align="center" width="120" />
-          <el-table-column label="手机号码" prop="mobile" align="center" width="120" />
-          <el-table-column label="更新日期" prop="update" align="center" min-width="120" />
-          <el-table-column label="操作" align="center" width="120">
+          <el-table-column label="收件人名称" prop="name" align="center" />
+          <el-table-column label="收件人邮箱" prop="email" align="center" />
+          <el-table-column label="手机号码" prop="mobile" align="center" />
+          <el-table-column label="更新日期" prop="update" align="center" />
+          <el-table-column label="操作" align="center">
             <template slot-scope="{row}">
               <el-button type="primary" size="mini" @click="">
                 编辑

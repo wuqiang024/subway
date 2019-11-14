@@ -8,32 +8,32 @@
         <el-row>
           <el-col :span="6">
             <el-form-item label="事故路线:" class="postInfo-container-item">
-              <el-select v-model="listQuery.importance" placeholder="请选择" clearable class="filter-item">
-                <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+              <el-select v-model="listQuery.routes" placeholder="请选择" clearable class="filter-item">
+                <el-option v-for="item in routes" :key="item.id" :label="item.name" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
 
           <el-col :span="6">
             <el-form-item label="事故方向:" class="postInfo-container-item">
-              <el-select v-model="listQuery.importance" placeholder="请选择" clearable class="filter-item">
-                <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+              <el-select v-model="listQuery.directions" placeholder="请选择" clearable class="filter-item">
+                <el-option v-for="item in directions" :key="item.id" :label="item.name" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
 
           <el-col :span="6">
             <el-form-item label="事故类型:" class="postInfo-container-item">
-              <el-select v-model="listQuery.importance" placeholder="请选择" clearable class="filter-item">
-                <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+              <el-select v-model="listQuery.accidentTypes" placeholder="请选择" clearable class="filter-item">
+                <el-option v-for="item in accidentTypes" :key="item.id" :label="item.name" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
 
           <el-col :span="6">
             <el-form-item label="事故等级:" class="postInfo-container-item">
-              <el-select v-model="listQuery.importance" placeholder="请选择" clearable class="filter-item">
-                <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+              <el-select v-model="listQuery.accidentLevels" placeholder="请选择" clearable class="filter-item">
+                <el-option v-for="item in accidentLevels" :key="item.id" :label="item.name" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -87,8 +87,8 @@
         <el-row>
           <el-col :span="6">
             <el-form-item label="中断类型:" class="postInfo-container-item">
-              <el-select v-model="listQuery.importance" placeholder="请选择" clearable class="filter-item">
-                <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+              <el-select v-model="listQuery.interruptTypes" placeholder="请选择" clearable class="filter-item">
+                <el-option v-for="item in interruptTypes" :key="item.id" :label="item.name" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -155,6 +155,7 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { searchUser } from '@/api/remote-search'
 import Upload from '@/components/Upload/SingleImage3'
+import { mixin } from '@/mixins'
 
 const defaultForm = {
   status: 'draft',
@@ -187,6 +188,7 @@ export default {
       return calendarTypeKeyValue[type]
     }
   },
+  mixins: [mixin],
   data() {
     return {
       tableKey: 0,
@@ -229,8 +231,6 @@ export default {
       },
       downloadLoading: false,
       userListOptions: [],
-      rules: {
-      }
     }
   },
   computed: {
@@ -252,6 +252,11 @@ export default {
   },
   created() {
     this.getList()
+    this.getRoutes()
+    this.getDirections()
+    this.getAccidentTypes()
+    this.getAccidentLevels()
+    this.getInterruptTypes()
   },
   methods: {
     getList() {

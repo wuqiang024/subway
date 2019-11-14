@@ -1,33 +1,41 @@
+<style scoped>
+.filter-container .filter-item { margin-bottom: 0 }
+</style>
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!-- <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
-      <el-select v-model="listQuery.importance" placeholder="事故线路" clearable style="width: 110px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+      <el-select
+        v-model="listQuery.routes"
+        placeholder="事故线路"
+        clearable
+        style="width: 150px"
+        class="filter-item"
+        multiple
+        collapse-tags
+      >
+        <el-option v-for="item in routes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="事故方向" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.directions" multiple collapse-tags placeholder="事故方向" clearable class="filter-item" style="width: 150px">
+        <el-option v-for="item in directions" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="事故类型" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.accidentTypes" placeholder="事故类型" clearable class="filter-item" multiple collapse-tags style="width: 170px">
+        <el-option v-for="item in accidentTypes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="事故等级" clearable class="filter-item" style="width: 110px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      <el-select v-model="listQuery.accidentLevels" placeholder="事故等级" clearable class="filter-item" multiple collapse-tags style="width: 150px; margin-right: 10px">
+        <el-option v-for="item in accidentLevels" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <!-- <el-select v-model="listQuery.sort" pla style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select> -->
+      <el-radio v-for="item in orderBy" :key="item.key" v-model="listQuery.orderBy" :label="item.key">{{ item.name }}</el-radio>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
     </div>
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange">
-      <el-table-column label="序号" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="序号" prop="id" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="事故时间" width="180px" sortable="custom" align="center">
+      <el-table-column label="事故时间" width="180px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
@@ -36,22 +44,13 @@
         <template slot-scope="scope">
           <span>1号线</span>
         </template>
-        <!-- <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
-        </template> -->
       </el-table-column>
       <el-table-column label="事故方向" width="120px" align="center">
         <template slot-scope="scope">
           <span>上行下行</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-        <template slot-scope="scope">
-          <span style="color:red;">{{ scope.row.reviewer }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column label="事故等级" width="120px" sortable="custom" align="center">
+      <el-table-column label="事故等级" width="120px" align="center">
         <template slot-scope="scope">
           <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon" />
         </template>
@@ -79,15 +78,6 @@
           <el-button type="success" size="mini" @click="handleUpdate(row)">
             删除
           </el-button>
-          <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-            查看
-          </el-button> -->
-          <!-- <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-            Draft
-          </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
-            Delete
-          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -142,6 +132,7 @@ import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { mixin } from '@/mixins'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -173,28 +164,14 @@ export default {
       return calendarTypeKeyValue[type]
     }
   },
+  mixins: [mixin],
   data() {
     return {
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined, // 事故类型
-        sort: '+id',
-        line: undefined, // 事故线路
-        direction: undefined, // 事故方向
-        level: undefined, // 事故等级
-        orderByTime: false, // 按最新时间
-        orderByLevel: false // 按最高等级
-      },
-      importanceOptions: [1, 2, 3],
       calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -222,8 +199,19 @@ export default {
       downloadLoading: false
     }
   },
+  watch: {
+    'listQuery.orderBy': function(n, o) {
+      this.listQuery.page = 1
+      this.getList()
+    }
+  },
   created() {
     this.getList()
+    this.getRoutes()
+    this.getDirections()
+    this.getAccidentTypes()
+    this.getAccidentLevels()
+    this.getOrderBy()
   },
   methods: {
     getList() {
@@ -240,6 +228,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1
+      console.log(this.listQuery)
       this.getList()
     },
     handleModifyStatus(row, status) {
