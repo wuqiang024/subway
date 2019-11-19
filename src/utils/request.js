@@ -14,15 +14,12 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (config.method === 'post') {
-      console.log(1)
       axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     } else {
-      console.log(2)
-      axios.defaults.headers['Content-Type'] = ''
+      axios.defaults.headers['Content-Type'] = 'application/json'
     }
     // do something before request is sent
     if (getToken()) {
-      console.log(3)
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['access_token'] = getToken()

@@ -26,58 +26,35 @@
       </el-table-column>
       <el-table-column label="事故时间" align="center">
         <template slot-scope="scope">
-          <!-- <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span> -->
-          <span> {{ scope.row.createTime }}</span>
+          <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="事故线路" align="center">
         <template slot-scope="scope">
-          <span>1号线</span>
+          <span>{{ scope.row.lineName }}</span>
         </template>
-        <!-- <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
-        </template> -->
       </el-table-column>
       <el-table-column label="事故方向" align="center">
         <template slot-scope="scope">
-          <span>上行下行</span>
+          <span>{{ scope.row.directionName }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-        <template slot-scope="scope">
-          <span style="color:red;">{{ scope.row.reviewer }}</span>
-        </template>
-      </el-table-column> -->
       <el-table-column label="事故等级" align="center">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon" />
+          <svg-icon v-for="n in +scope.row.accidentLevel" :key="n" icon-class="star" class="meta-item__icon" />
         </template>
       </el-table-column>
       <el-table-column label="事故区间" align="center">
         <template slot-scope="scope">
-          <span>西门口至东山路，西门口至东山路</span>
+          <span>{{ scope.row.stationName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="事故类型" align="center">
         <template slot-scope="scope">
-          <span>道岔故障</span>
+          <span>{{ scope.row.typeName }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="Readings" align="center" width="95">
-        <template slot-scope="{row}">
-          <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column label="处理状态" class-name="status-col" width="120">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            <!-- {{ row.status }} -->
-            {{ row.status == 'deleted' ? '未处理': '已处理' }}
-          </el-tag>
-        </template>
-      </el-table-column>
+      
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
@@ -188,7 +165,6 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
@@ -236,14 +212,13 @@ export default {
     getList() {
       this.listLoading = true
       search(this.listQuery).then(response => {
-        console.log(response)
         this.list = response.data
         this.total = response.count
 
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 0)
       })
     },
     handleFilter() {

@@ -41,16 +41,18 @@
             </el-table-column>
             <el-table-column label="事故时间" align="center">
               <template slot-scope="scope">
-                <span style="white-space: nowrap;">{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+                <span style="white-space: nowrap;">{{ scope.row.createTime }}</span>
               </template>
             </el-table-column>
             <el-table-column label="事故等级" align="center">
               <template slot-scope="scope">
-                <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon" />
+                <svg-icon v-for="n in +scope.row.accidentLevel" :key="n" icon-class="star" class="meta-item__icon" />
               </template>
             </el-table-column>
             <el-table-column label="状态" align="center">
-              <span>道岔故障</span>
+              <template slot-scope="scope">
+                <span style="white-space: nowrap;">{{ scope.row.treatmentDescription }}</span>
+              </template>
             </el-table-column>
           </el-table>
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" style="margin-top:0" @pagination="getList" />
@@ -63,7 +65,7 @@
   </div>
 </template>
 <script>
-import { fetchList } from '@/api/article'
+import { search } from '@/api/accident'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -100,33 +102,16 @@ export default {
   },
   methods: {
     handleClick(tab, event) {
-      var map = new AMap.Map("container", {
-              resizeEnable: true
-          });
-      var lineArr = [
-        [116.368904, 39.913423],
-        [116.382122, 39.901176],
-        [116.387271, 39.912501],
-        [116.398258, 39.904600]
-      ];
-      var circle = new AMap.Circle({
-        map: map,
-        center: lineArr[0],          //设置线覆盖物路径
-        radius: 1500,
-        strokeColor: "#3366FF", //边框线颜色
-        strokeOpacity: 0.3,       //边框线透明度
-        strokeWeight: 3,        //边框线宽
-        fillColor: "#FFA500", //填充色
-        fillOpacity: 0.35//填充透明度
-      });
-      map.setFitView();
+      var map = new window.AMap.Map('container', {
+        resizeEnable: true
+      })
+      map.setFitView()
     },
     getList() {
       this.listLoading = true
-      this.listQuery.limit = 10
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+      search(this.listQuery).then(response => {
+        this.list = response.data
+        this.total = response.count
 
         // Just to simulate the time of the request
         setTimeout(() => {
