@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <div class="filter-container" style="padding-bottom: 0">
+    <div class="filter-container" style="padding-bottom: 0;">
       <el-select v-model="listQuery.routes" placeholder="事故线路" clearable style="width: 150px" class="filter-item">
         <el-option v-for="item in routes" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
@@ -20,11 +20,11 @@
     </div>
     <div class="filter-container">
       <el-date-picker v-model="date" type="date" placeholder="选择日期" />
-      <el-select v-model="listQuery.dateTypes" placeholder="日期属性" clearable style="width: 150px; margin-bottom: 0" class="filter-item" multiple collapse-tags>
-        <el-option v-for="item in dateTypes" :key="item.id" :label="item.name" :value="item.id" />
+      <el-select v-model="listQuery.accidentWeekday" placeholder="日期属性" clearable style="width: 150px; margin-bottom: 0" class="filter-item" multiple collapse-tags>
+        <el-option v-for="item in accidentWeekdays" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.festivalTypes" placeholder="节日属性" clearable style="width: 150px; margin-bottom: 0" class="filter-item" multiple collapse-tags>
-        <el-option v-for="item in festivalTypes" :key="item.id" :label="item.name" :value="item.id" />
+      <el-select v-model="listQuery.accidentFestival" placeholder="节日属性" clearable style="width: 150px; margin-bottom: 0" class="filter-item" multiple collapse-tags>
+        <el-option v-for="item in accidentFestivals" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
       <el-select v-model="listQuery.interruptTypes" placeholder="中断类型" clearable style="width: 150px; margin-bottom: 0" class="filter-item">
         <el-option v-for="item in interruptTypes" :key="item.id" :label="item.name" :value="item.id" />
@@ -32,7 +32,7 @@
     </div>
     <div>
       <el-row>
-        <el-col :span="24" style="text-align: left;" :lg="9">
+        <el-col :span="24" style="text-align: left; margin-right: 10px" :lg="8">
           <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @row-click="handleClick">
             <el-table-column label="序号" prop="id" align="center" width="80">
               <template slot-scope="scope">
@@ -92,8 +92,8 @@ export default {
     this.getDirections()
     this.getAccidentTypes()
     this.getAccidentLevels()
-    this.getDateTypes()
-    this.getFestivalTypes()
+    this.getAccidentWeekdays()
+    this.getFestivals()
     this.getInterruptTypes()
     this.getDataTable()
   },

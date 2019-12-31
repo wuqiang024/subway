@@ -2,13 +2,13 @@
   <div class="app-container">
     <div class="filter-container">
       <el-select v-model="listQuery.lineName" placeholder="事故线路" clearable style="width: 150px" class="filter-item">
-        <el-option v-for="item in routes" :key="item.id" :label="item.name" :value="item.id" />
+        <el-option v-for="item in routes" :key="item.name" :label="item.name" :value="item.name" />
       </el-select>
-      <el-select v-model="listQuery.directionName" placeholder="事故方向" clearable class="filter-item" style="width: 150px">
-        <el-option v-for="item in directions" :key="item.id" :label="item.name" :value="item.id" />
+      <el-select v-model="listQuery.directionName" placeholder="线路方向" clearable class="filter-item" style="width: 150px">
+        <el-option v-for="item in directions" :key="item.name" :label="item.name" :value="item.name" />
       </el-select>
       <el-select v-model="listQuery.accidentType" placeholder="事故类型" clearable class="filter-item" style="width: 170px;">
-        <el-option v-for="item in accidentTypes" :key="item.id" :label="item.name" :value="item.id" />
+        <el-option v-for="item in accidentTypes" :key="item.name" :label="item.name" :value="item.name" />
       </el-select>
       <el-select v-model="listQuery.accidentLevel" placeholder="事故等级" clearable class="filter-item" style="width: 150px; margin-right: 10px">
         <el-option v-for="item in accidentLevels" :key="item.id" :label="item.name" :value="item.id" />
@@ -54,13 +54,14 @@
           <span>{{ scope.row.typeName }}</span>
         </template>
       </el-table-column>
-      
+
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" @click="$router.push('/programme/programme-report')">
             查看
           </el-button>
-          <el-button type="success" size="mini" @click="handleUpdate(row)">
+          <!-- <el-button type="success" size="mini" @click="handleUpdate(row)"> -->
+          <el-button type="success" size="mini" @click="$router.push(`/accident/accident-submit?id=${row.id}`)">
             编辑
           </el-button>
           <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
@@ -325,26 +326,6 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
-    },
-    // handleFetchPv(pv) {
-    //   fetchPv(pv).then(response => {
-    //     this.pvData = response.data.pvData
-    //     this.dialogPvVisible = true
-    //   })
-    // },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {

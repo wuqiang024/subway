@@ -21,7 +21,7 @@
         />
       </el-form-item>
 
-      <el-form-item prop="validCode">
+      <el-form-item prop="validCode" style="position: relative;">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
@@ -34,8 +34,9 @@
           tabindex="3"
           autocomplete="on"
         />
+        <img :src="validCodeUrl" style="position: absolute; right: 0" @click="uuid">
       </el-form-item>
-      <img :src="validCodeUrl" @click="uuid">
+
       <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
@@ -79,8 +80,8 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+      if (value.length < 5) {
+        callback(new Error('The password can not be less than 5 digits'))
       } else {
         callback()
       }
@@ -178,6 +179,7 @@ export default {
             })
             .catch(() => {
               this.loading = false
+              this.uuid()
             })
         } else {
           console.log('error submit!!')

@@ -1,11 +1,11 @@
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
 
-export function search(query) {
+export function getLines(query) {
   return request({
-    url: '/accident/selectAccPageList',
-    method: 'get',
-    params: { access_token: getToken(), ...query }
+    url: '/line/getLines',
+    method: 'post',
+    data: { access_token: getToken(), ...query }
   })
 }
 
@@ -17,10 +17,10 @@ export function submit(query) {
   })
 }
 
-export function getAccidentById(id) {
+export function getStations(query) {
   return request({
-    url: '/accident/selectAccidentById',
+    url: '/line/getLines?access_token=58829bd2f4fe3c47',
     method: 'get',
-    params: { access_token: getToken(), id }
+    params: { access_token: getToken(), ...query }
   })
 }

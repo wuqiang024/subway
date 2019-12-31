@@ -7,27 +7,38 @@ export const mixin = {
         lineName: undefined, // 事故线路
         directionName: undefined, // 事故方向
         accidentType: undefined, // 事故类型
-        festivalTypes: undefined, // 节日类型
+        accidentFestival: undefined, // 节日类型
         fileTypes: undefined, // 文件类型
-        dateTypes: undefined, // 日期类型
+        accidentWeekday: undefined, // 日期类型
         interruptTypes: undefined,
         accidentLevel: undefined, // 事故等级
         sort: '+id',
-        orderBy: undefined // 按最高等级
+        orderBy: undefined, // 按最高等级
+        processStatus: undefined,
+
+        treatmentDescription: undefined,
+        passengersAmount: undefined,
+        passengers: undefined,
+        interruptionTime: undefined,
+        interruptionDuration: undefined,
+        station: undefined
+
       },
       routes: [],
       directions: [],
       accidentTypes: [],
       fileTypes: undefined,
-      dateTypes: [],
-      festivalTypes: [],
+      accidentWeekdays: [],
+      accidentFestivals: [],
       accidentLevels: [],
       interruptTypes: [],
       orderBy: [],
       tableData: undefined,
       dateRange: '',
       startTime: '',
-      endTime: ''
+      endTime: '',
+      processStatus: [],
+      stations: []
     }
   },
   computed: {
@@ -81,8 +92,8 @@ export const mixin = {
         { id: 5, name: '出行时间表' },
         { id: 6, name: '行车案场景表' }]
     },
-    getDateTypes() {
-      this.dateTypes = [
+    getAccidentWeekdays() {
+      this.accidentWeekdays = [
         { id: 1, name: '周一' },
         { id: 2, name: '周二' },
         { id: 3, name: '周三' },
@@ -96,8 +107,8 @@ export const mixin = {
         { id: 1, name: '单点故障' },
         { id: 2, name: '区间故障' }]
     },
-    getFestivalTypes() {
-      this.festivalTypes = [
+    getFestivals() {
+      this.accidentFestivals = [
         { id: 1, name: '元旦' },
         { id: 2, name: '妇女节' },
         { id: 3, name: '植树节' },
@@ -123,14 +134,21 @@ export const mixin = {
     },
     getAccidentLevels() {
       this.accidentLevels = [
-        { id: 1, name: 'I级' },
-        { id: 2, name: 'II级' },
-        { id: 3, name: 'III级' }]
+        { id: 1, name: '一级' },
+        { id: 2, name: '二级' },
+        { id: 3, name: '三级' }]
     },
     getOrderBy() {
       this.orderBy = [
         { key: 'time', name: '按最新时间' },
         { key: 'level', name: '按最高等级' }]
+    },
+    // 获取事故状态
+    getProcessStatus() {
+      this.processStatus = [
+        { id: 0, name: '未处理' },
+        { id: 1, name: '处理中' },
+        { id: 2, name: '处理完毕' }]
     },
     getDataTable() {
       this.tableData = [{
@@ -179,6 +197,12 @@ export const mixin = {
           '东山口': 53
         }
       }]
+    },
+    getStations() {
+      this.stations = [
+        { id: 1, name: '西门口' },
+        { id: 2, name: '东山口' }
+      ]
     }
   },
   watch: {
